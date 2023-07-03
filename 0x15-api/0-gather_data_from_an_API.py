@@ -1,30 +1,38 @@
 #!/usr/bin/python3
-'''A script that gathers employee name completed
-tasks and total number of tasks from an API
-'''
-
-import re
+"""Returns to-do list information for a given employee ID."""
 import requests
 import sys
 
-REST_API = "https://jsonplaceholder.typicode.com"
 
-if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        if re.fullmatch(r'\d+', sys.argv[1]):
-            id = int(sys.argv[1])
-            emp_req = requests.get('{}/users/{}'.format(REST_API, id)).json()
-            task_req = requests.get('{}/todos'.format(REST_API)).json()
-            emp_name = emp_req.get('name')
-            tasks = list(filter(lambda x: x.get('userId') == id, task_req))
-            completed_tasks = list(filter(lambda x: x.get('completed'), tasks))
-            print(
-                'Employee {} is done with tasks({}/{}):'.format(
-                    emp_name,
-                    len(completed_tasks),
-                    len(tasks)
-                )
-            )
-            if len(completed_tasks) > 0:
-                for task in completed_tasks:
-                    print('\t {}'.format(task.get('title')))
+def tasks_done(id):
+    '''Script that displays an employee completed TODO tasks in stout
+        Parameters:
+        employee_id: Is an interger representing an employee id.
+    '''
+
+    url = "https://jsonplaceholder.typicode.com/users/{}".format(id)
+    response = requests.get(url)
+    response_json = response.json()
+    employee_name = response_json.get("name")
+
+    url = "https://jsonplaceholder.typicode.com/users/{}/todos".format(id)
+    todos = requests.get(url)
+    todos_json = todos.json()
+    number_tasks = len(todos_json)
+
+    task_compleated = 0
+    task_list = ""
+
+    for task in todos_json:
+        if task.get("completed") is True:
+            task_compleated += 1
+            task_list += "\t " + task.get("title") + "\n"
+
+    print("Employee {} is done with tasks({}/{}):".format(employee_name,
+                                                          task_compleated,
+                                                          number_tasks))
+    print(task_list[:-1])
+
+
+if __name__ == "__main__":
+    tasks_done(sys.argv[1])
