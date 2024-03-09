@@ -12,14 +12,14 @@ def tasks_done():
     all_todos = {}
     while True:
         url = "https://jsonplaceholder.typicode.com/users/{}".format(id)
-        response = requests.get(url)
+        response = requests.get(url, timeout=60)
         response_json = response.json()
         if len(response_json) == 0:
             break
         employee_name = response_json.get("name")
 
         url = "https://jsonplaceholder.typicode.com/users/{}/todos".format(id)
-        todos = requests.get(url)
+        todos = requests.get(url, timeout=60)
         todos_json = todos.json()
         task_list = []
 
